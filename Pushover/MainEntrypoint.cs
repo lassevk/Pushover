@@ -1,4 +1,7 @@
+using System.ComponentModel;
+
 using LVK.Core.App.Console;
+using LVK.Core.App.Console.CommandLineInterface;
 using LVK.Core.App.Console.Parameters;
 using LVK.Events;
 using LVK.Notifications.Pushover;
@@ -17,14 +20,19 @@ public class MainEntrypoint : IMainEntrypoint
     [PositionalArguments]
     public List<string> Messages { get; } = new();
 
+    [CommandLineOption("-v")]
+    [CommandLineOption("--verbose")]
+    [Description("Show verbose information")]
+    public bool Verbose { get; set; }
+
     public async Task<int> RunAsync(CancellationToken stoppingToken)
     {
         var message = string.Join(" ", Messages);
 
-        Console.WriteLine("Sending: " + message);
+        if (Verbose)
+            Console.WriteLine("Sending: " + message);
 
         await _eventBus.PublishAsync(new PushoverNotification(message), stoppingToken);
-
 
         return 0;
     }
